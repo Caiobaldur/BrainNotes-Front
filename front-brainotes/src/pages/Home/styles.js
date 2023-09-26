@@ -50,7 +50,11 @@ export const Search = styled.div`
   padding: 64px 64px 0;
 `;
 
-export const Content = styled.div``;
+export const Content = styled.div`
+  grid-area: content;
+  padding: 64px 64px 0;
+  overflow-y: auto;
+`;
 
 export const NewNote = styled.button`
   grid-area: newnote;
