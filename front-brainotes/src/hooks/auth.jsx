@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useState, useEffect } from "react";
 
 import { api } from "../services/api";
 
@@ -16,6 +16,9 @@ function AuthProvider({children}){
       api.defaults.headers.authorization = `Bearer ${token}`
       setData({ user, token });
 
+      localStorage.setItem("@brainotes: user", JSON.stringify(user));
+      localStorage.setItem("@brainotes: token", token);
+
     } catch(error){
       if(error.response){
         alert(error.response.data.message)
@@ -25,8 +28,32 @@ function AuthProvider({children}){
     }
   }
 
+  function signOut() {
+   localStorage.removeItem("@brainotes: token");
+    localStorage.removeItem("@brainotes: user");
+
+    setData({});
+  }
+
+
+
+  useEffect(() => {
+    const token = localStorage.getItem("@brainotes: token");
+    const user = localStorage.getItem("@brainotes: user");
+
+    if(token && user){
+      api.defaults.headers.authorization = `Bearer ${token}`
+
+      setData({
+        token,
+        user: JSON.parse(user)
+      })
+    }
+
+  }, [])
+
   return(
-    <AuthContext.Provider value={{ signIn, user: data.user }}>
+    <AuthContext.Provider value={{ signIn, user: data.user, signOut }}>
       {children}
     </AuthContext.Provider>
   )
