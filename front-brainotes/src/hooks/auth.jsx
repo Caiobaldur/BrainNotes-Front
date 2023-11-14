@@ -13,11 +13,12 @@ function AuthProvider({children}){
       const response = await api.post("/sessions", {email,password});
       const {user,token} = response.data;
 
-      api.defaults.headers.common['Authorization'] = `Bearer ${token}`
-      setData({ user, token });
-
       localStorage.setItem("@brainotes: user", JSON.stringify(user));
       localStorage.setItem("@brainotes: token", token);
+      
+      api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+      setData({ user, token });
+
 
     } catch(error){
       if(error.response){
@@ -35,9 +36,17 @@ function AuthProvider({children}){
     setData({});
   }
 
-  async function updateProfile({user}){
+  async function updateProfile({user, avatarFile}){
     
     try{
+
+      if(avatarFile){
+        const fileUploadForm = new FormData();
+        fileUploadForm.append("avatar", avatarFile);
+
+        const response = await api.patch("/users/avatar", fileUploadForm);
+        user.avatar = response.data.avatar;
+      }
 
       await api.put("/users", user)
       localStorage.setItem("@brainotes: user", JSON.stringify(user))
